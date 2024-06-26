@@ -9,28 +9,54 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-if (isset($_GET['registration_no'])) {
-    $registration_no = $_GET['registration_no'];
+// Initialize variables for form submission and result display
+$registration_no = '';
+$year_semester = '';
+$resultData = null;
+$errorMsg = '';
 
-    $sql = "SELECT result.*, student.registration_no AS registration_no
-            FROM result
-            JOIN student ON result.registration_no_id = student.id
-            WHERE student.registration_no = '$registration_no'";
-$result = $conn->query($sql);
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if (isset($_GET['registration_no']) && isset($_GET['year_semester'])) {
+        $registration_no = $_GET['registration_no'];
+        $year_semester = $_GET['year_semester'];
 
-    if ($result->num_rows > 0) {
-        // Display student details
-        $row = $result->fetch_assoc();
-        
-        // Display other relevant details
+        // Validate registration_no as numeric (assuming it's an integer)
+        if (!is_numeric($registration_no)) {
+            $errorMsg = "Invalid registration number.";
+        } else {
+            // Query to fetch result based on registration number and year_semester
+            $sql = "SELECT result.*, student.registration_no AS registration_no
+                    FROM result
+                    JOIN student ON result.registration_no_id = student.id
+                    WHERE student.registration_no = '$registration_no'
+                    AND result.year_semester = '$year_semester'";
+            $result = $conn->query($sql);
+
+            if ($result === false) {
+                $errorMsg = "Database error: " . $conn->error;
+            } elseif ($result->num_rows > 0) {
+                // Redirect to result_details.php with matched parameters
+                header("Location: https://tnscpe.graymatterworks.com/result_details.php?registration_no=$registration_no&year_semester=$year_semester");
+                exit();
+            } else {
+                // Check if registration number exists
+                $checkStudentSql = "SELECT * FROM student WHERE registration_no = '$registration_no'";
+                $studentResult = $conn->query($checkStudentSql);
+                if ($studentResult->num_rows == 0) {
+                    $errorMsg = "Invalid registration number.";
+                } else {
+                    $errorMsg = "No data found for the student in year semester $year_semester.";
+                }
+            }
+        }
+    } elseif (empty($_GET['registration_no']) && empty($_GET['year_semester'])) {
+        // No parameters provided, do nothing or show a message
     } else {
-        echo "No student details found for the given user ID.";
+        $errorMsg = "Please provide both registration number and semester.";
     }
-
-    $conn->close();
-} else {
-    echo "No user ID provided.";
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -154,7 +180,7 @@ $result = $conn->query($sql);
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="result.php?registration_no=<?php echo $_SESSION['registration_no']; ?>"><i class="fas fa-poll"></i> Result</a>
+          <a class="nav-link" href="result.php"><i class="fas fa-poll"></i> Result</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#"><i class="fas fa-file-pdf">&nbsp;</i>Pdf</a>
@@ -172,27 +198,45 @@ $result = $conn->query($sql);
         Student Result
       </div>
       <div class="card-body">
-        <center><h4>Result:</h4></center>
+        <center><h4>Result</h4></center>
         <br>
-        <p class="card-text"><strong>Registration No:</strong> <?php echo $row['registration_no_id']; ?></p>
-        <p class="card-text"><strong>Year/Semester:</strong> <?php echo $row['year_semester']; ?></p>
-        <p class="card-text"><strong>Exam Month and Year:</strong> <?php echo $row['exam_month_year']; ?></p>
-        <p class="card-text"><strong>Total Marks:</strong> <?php echo $row['total_marks']; ?></p>
-        <p class="card-text"><strong>Obtained Marks:</strong> <?php echo $row['obtained_marks']; ?></p>
-        <p class="card-text"><strong>SGPA:</strong> <?php echo $row['sgpa']; ?></p>
-        <p class="card-text"><strong>Status:</strong>
-         <?php
-            if ($row['status'] == 1) {
-              echo '<span style="color: green;">Pass</span>';
-             } else {
-                echo '<span style="color: red;">Fail</span>';
-             }
-           ?>
-                        </p>
-        <!-- Additional details as needed -->
-      </div>
+        
+        <!-- Form to input registration number and select semester -->
+        <form method="get" action="">
+          <div class="form-group">
+            <label for="registration_no">Registration Number</label>
+            <input type="text" class="form-control" id="registration_no" name="registration_no" required>
+          </div>
+          <div class="form-group">
+            <label for="year_semester">Semester</label>
+            <select class="form-control" id="year_semester" name="year_semester" required>
+              <option value="">Select Semester</option>
+              <?php
+              // Fetch distinct semesters from the result table
+              require 'db.php';
+              $sql = "SELECT DISTINCT year_semester FROM result";
+              $result = $conn->query($sql);
+              if ($result->num_rows > 0) {
+                  while ($row = $result->fetch_assoc()) {
+                      echo "<option value='{$row['year_semester']}'>{$row['year_semester']}</option>";
+                  }
+              }
+              $conn->close();
+              ?>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+                <!-- Display error message if any -->
+                <?php if (!empty($errorMsg)) : ?>
+                    <div class="alert alert-danger mt-4" role="alert">
+                        <?php echo $errorMsg; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
-  </div>
 
   <!-- Bootstrap JS and dependencies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -200,3 +244,4 @@ $result = $conn->query($sql);
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>
+
