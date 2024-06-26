@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                 $errorMsg = "Database error: " . $conn->error;
             } elseif ($result->num_rows > 0) {
                 // Redirect to result_details.php with matched parameters
-                header("Location: https://tnscpe.graymatterworks.com/result_details.php?registration_no=$registration_no&year_semester=$year_semester");
+                header("Location: https://tnscpewebsite.graymatterworks.com/result_details.php?registration_no=$registration_no&year_semester=$year_semester");
                 exit();
             } else {
                 // Check if registration number exists
