@@ -7,8 +7,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // Get student_id from URL parameter
-if (isset($_GET['student_id'])) {
-    $student_id = $_GET['student_id'];
+if (isset($_GET['registration_no'])) {
+    $registration_no = $_GET['registration_no'];
     // Use $student_id as needed
 } else {
     // Handle case where student_id is not provided
@@ -87,11 +87,8 @@ if (isset($_GET['student_id'])) {
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
-          <a class="nav-link"  href="dashboard.php?student_id=<?php echo $_SESSION['user_id']; ?>"><i class="fas fa-home"></i> Dashboard</a>
-        </li>
         <li class="nav-item">
-          <a class="nav-link" href="student_details.php?student_id=<?php echo $_SESSION['user_id']; ?>">
+          <a class="nav-link" href="student_details.php?registration_no=<?php echo $_SESSION['registration_no']; ?>">
             <i class="fas fa-user"></i> Student Profile
           </a>
         </li>

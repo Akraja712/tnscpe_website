@@ -12,10 +12,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 if (isset($_GET['registration_no'])) {
     $registration_no = $_GET['registration_no'];
 
-    $sql = "SELECT student.*, category.name as category_name
-    FROM student 
-    JOIN category ON student.category_id = category.id 
-    WHERE student.registration_no = $registration_no";
+    $sql = "SELECT result.*, student.registration_no AS registration_no
+            FROM result
+            JOIN student ON result.registration_no_id = student.id
+            WHERE student.registration_no = '$registration_no'";
 $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -169,27 +169,26 @@ $result = $conn->query($sql);
   <div class="container">
     <div class="card">
       <div class="card-header">
-        Student Profile
+        Student Result
       </div>
       <div class="card-body">
-        <center><h4>Course/Programe Details:</h4></center>
+        <center><h4>Result:</h4></center>
         <br>
-        <img src="https://tnscpe.graymatterworks.com/<?php echo $row['image']; ?>" class="card-img-top float-right" alt="Student Image">
-        <p class="card-text"><strong>Form No:</strong> <?php echo $row['form_no']; ?></p>
-        <p class="card-text"><strong>Admission Year:</strong> <?php echo $row['admission_year']; ?></p>
-        <p class="card-text"><strong>Registration No:</strong> <?php echo $row['registration_no']; ?></p>
-        <p class="card-text"><strong>Course Type:</strong> <?php echo $row['course_type']; ?></p>
-        <p class="card-text"><strong>Faculty:</strong> <?php echo $row['faculty']; ?></p>
-        <p class="card-text"><strong>Course Name:</strong> <?php echo $row['course_name']; ?></p>
-        <div class="body-line"></div>
-        <center><h4>Personal Details:</h4></center>
-        <br>
-        <p class="card-text"><strong>Name:</strong> <?php echo $row['name']; ?></p>
-        <p class="card-text"><strong>Father's Name:</strong> <?php echo $row['fathers_name']; ?></p>
-        <p class="card-text"><strong>Gender:</strong> <?php echo $row['gender']; ?></p>
-        <p class="card-text"><strong>Date of Birth:</strong> <?php echo $row['dob']; ?></p>
-        <p class="card-text"><strong>Category:</strong> <?php echo $row['category_name']; ?></p>
-        <p class="card-text"><strong>Nationality:</strong> <?php echo $row['nationality']; ?></p>
+        <p class="card-text"><strong>Registration No:</strong> <?php echo $row['registration_no_id']; ?></p>
+        <p class="card-text"><strong>Year/Semester:</strong> <?php echo $row['year_semester']; ?></p>
+        <p class="card-text"><strong>Exam Month and Year:</strong> <?php echo $row['exam_month_year']; ?></p>
+        <p class="card-text"><strong>Total Marks:</strong> <?php echo $row['total_marks']; ?></p>
+        <p class="card-text"><strong>Obtained Marks:</strong> <?php echo $row['obtained_marks']; ?></p>
+        <p class="card-text"><strong>SGPA:</strong> <?php echo $row['sgpa']; ?></p>
+        <p class="card-text"><strong>Status:</strong>
+         <?php
+            if ($row['status'] == 1) {
+              echo '<span style="color: green;">Pass</span>';
+             } else {
+                echo '<span style="color: red;">Fail</span>';
+             }
+           ?>
+                        </p>
         <!-- Additional details as needed -->
       </div>
     </div>

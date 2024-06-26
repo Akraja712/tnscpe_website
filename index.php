@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['loggedin'] = true;
             $_SESSION['user_id'] = $user_id;
             $_SESSION['registration_no'] = $registration_no; // Store registration number in session
-            header("Location: dashboard.php?student_id=$user_id");
+            header("Location: student_details.php?registration_no=$registration_no");
             exit();
         } else {
             $error = "Invalid registration number or date of birth";
