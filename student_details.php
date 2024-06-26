@@ -12,9 +12,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 if (isset($_GET['student_id'])) {
     $student_id = $_GET['student_id'];
 
-    // Query to fetch student details based on user_id
-    $sql = "SELECT * FROM student WHERE id = $student_id";
-    $result = $conn->query($sql);
+   // Query to fetch student details along with category name based on student_id
+   $sql = "SELECT student.*, category.category_name 
+   FROM student 
+   JOIN category ON student.category_id = category.id 
+   WHERE student.id = $student_id";
+$result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         // Display student details
@@ -192,7 +195,7 @@ if (isset($_GET['student_id'])) {
         <p class="card-text"><strong>Father's Name:</strong> <?php echo $row['fathers_name']; ?></p>
         <p class="card-text"><strong>Gender:</strong> <?php echo $row['gender']; ?></p>
         <p class="card-text"><strong>Date of Birth:</strong> <?php echo $row['dob']; ?></p>
-        <p class="card-text"><strong>Category:</strong> <?php echo $row['category_id']; ?></p>
+        <p class="card-text"><strong>Category:</strong> <?php echo $row['category_name']; ?></p>
         <p class="card-text"><strong>Nationality:</strong> <?php echo $row['nationality']; ?></p>
         <!-- Additional details as needed -->
       </div>
