@@ -48,15 +48,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle image upload
     if ($_FILES['image']['size'] != 0 && $_FILES['image']['error'] == 0 && !empty($_FILES['image'])) {
         // Process image upload
-        $target_dir = "upload/images/"; // Adjust to your project structure relative to the document root
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . strtolower($extension); // Unique filename
-        $target_path = $_SERVER['DOCUMENT_ROOT'] .'/'. $target_dir; // Adjust to your document root
-        $full_path = $target_path . $filename;
 
-        if (move_uploaded_file($temp_name, $full_path)) {
-            $upload_image = $target_dir . $filename;
+        // Remote URL for image upload
+        $remote_url = $DOMAIN_URL . "upload.php"; // Adjust to your actual upload endpoint on the remote server
+
+        // Prepare cURL resource
+        $curl = curl_init();
+
+        // Set cURL options for file upload
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $remote_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => [
+                'image' => new CURLFile($temp_name, $_FILES["image"]["type"], $filename)
+            ],
+        ]);
+
+        // Execute cURL request and get the response
+        $response = curl_exec($curl);
+
+        // Check for cURL errors
+        if ($response === false) {
+            echo '<p class="alert alert-danger">Curl error: ' . curl_error($curl) . '</p>';
+        } else {
+            // Assuming the response contains the remote URL of the uploaded image
+            $upload_image = trim($response); // Trim whitespace from the response
 
             // Insert data into the database
             $sql = "INSERT INTO admission (candidate_name, image, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
@@ -69,9 +89,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 echo '<p class="alert alert-danger">Error: ' . $sql . '<br>' . $conn->error . '</p>';
             }
-        } else {
-            echo '<p class="alert alert-danger">Failed to upload image.</p>';
         }
+
+        // Close cURL session
+        curl_close($curl);
     } else {
         // If the image is not uploaded or empty
         $sql = "INSERT INTO admission (candidate_name, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
@@ -89,6 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Close database connection
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
