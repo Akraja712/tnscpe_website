@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $candidate_name = mysqli_real_escape_string($conn, $_POST['candidate_name']);
     $fathers_name = mysqli_real_escape_string($conn, $_POST['fathers_name']);
     $mothers_name = mysqli_real_escape_string($conn, $_POST['mothers_name']);
-    $dob = mysqli_real_escape_string($conn, $_POST['dob']);
+    $dob = mysqli_real_escape_string($conn, $_POST['dob']); // Use mysqli_real_escape_string for all inputs
     $gender = mysqli_real_escape_string($conn, $_POST['gender']);
     $category_id = mysqli_real_escape_string($conn, $_POST['category_id']);
     $id_proof_type = mysqli_real_escape_string($conn, $_POST['id_proof_type']);
@@ -48,11 +48,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle image upload
     if ($_FILES['image']['size'] != 0 && $_FILES['image']['error'] == 0 && !empty($_FILES['image'])) {
         // Process image upload
-        $target_dir = "upload/images/";
+        $target_dir = "upload/images/"; // Adjust to your project structure relative to the document root
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-        $filename = uniqid() . '.' . strtolower($extension);
-        $target_path = $_SERVER['DOCUMENT_ROOT'] . $DOMAIN_URL . $target_dir;
+        $filename = uniqid() . '.' . strtolower($extension); // Unique filename
+        $target_path = $_SERVER['DOCUMENT_ROOT'] .'/tnscpe.graymatterworks.com/'. $target_dir; // Adjust to your document root
         $full_path = $target_path . $filename;
 
         if (move_uploaded_file($temp_name, $full_path)) {
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<p class="alert alert-danger">Failed to upload image.</p>';
         }
     } else {
-        // If no image uploaded
+        // If the image is not uploaded or empty
         $sql = "INSERT INTO admission (candidate_name, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
                 VALUES ('$candidate_name','$fathers_name','$mothers_name','$dob','$gender','$category_id','$id_proof_type','$id_proof_no','$employeed','$center_id')";
         if ($conn->query($sql) === TRUE) {
