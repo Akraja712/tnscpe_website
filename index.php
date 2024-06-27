@@ -1,38 +1,84 @@
 <?php
 session_start();
-require 'db.php';
+require 'db.php'; // Assuming this file contains database connection logic
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$errorMsgStudent = ''; // Initialize student login error message variable
+$errorMsgCenter = ''; // Initialize center login error message variable
+
+// Student Login Handling
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student_login'])) {
     $registration_no = isset($_POST['username']) ? $_POST['username'] : '';
     $dob = isset($_POST['password']) ? $_POST['password'] : '';
 
     if (!empty($registration_no) && !empty($dob)) {
         // Format the dob into YYYY-MM-DD format for comparison with database
         $dob_formatted = date('Y-m-d', strtotime($dob));
-        
+
+        // Prepare SQL query to check student credentials (sanitize inputs properly in actual implementation)
         $sql_query = "SELECT id FROM student WHERE registration_no='$registration_no' AND dob='$dob_formatted'";
         $result = $conn->query($sql_query);
 
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $user_id = $row['id'];
-            
+
+            // Set session variables
             $_SESSION['loggedin'] = true;
             $_SESSION['user_id'] = $user_id;
             $_SESSION['registration_no'] = $registration_no; // Store registration number in session
+
+            // Redirect to student details page
             header("Location: student_details.php?registration_no=$registration_no");
             exit();
         } else {
-            $error = "Invalid registration number or date of birth";
+            $errorMsgStudent = "Invalid registration number or date of birth";
         }
     } else {
-        $error = "Please provide registration number and date of birth";
+        $errorMsgStudent = "Please provide registration number and date of birth";
     }
-    echo "<script>alert('$error');</script>";
 }
 
-$conn->close();
+// Center Login Handling
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['center_login'])) {
+    $center_username = isset($_POST['center_username']) ? $_POST['center_username'] : '';
+    $center_password = isset($_POST['center_password']) ? $_POST['center_password'] : '';
+
+    if (!empty($center_username) && !empty($center_password)) {
+        // Prepare SQL query to fetch center details (sanitize inputs properly in actual implementation)
+        $sql_query = "SELECT center_code, password FROM center WHERE center_code='$center_username'";
+        $result = $conn->query($sql_query);
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $correct_username = $row['center_code'];
+            $correct_password = $row['password'];
+
+            // Verify password
+            if ($center_password === $correct_password) {
+                // Set session variables
+                $_SESSION['center_code'] = $correct_username; // Store center code in session
+                $_SESSION['center_loggedin'] = true; // Example session variable for center login
+
+                // Redirect to center dashboard
+                header("Location: center.php?center_code=$correct_username");
+                exit();
+            } else {
+                $errorMsgCenter = "Incorrect password";
+            }
+        } else {
+            $errorMsgCenter = "Invalid username";
+        }
+    } else {
+        $errorMsgCenter = "Please provide both username and password";
+    }
+}
+
+$conn->close(); // Close database connection
+
+// Include HTML or display forms here
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,6 +131,7 @@ $conn->close();
             <br>
             <!-- Form content for student login -->
             <form method="POST" action="index.php">
+              <input type="hidden" name="student_login" value="1"> <!-- Hidden field to differentiate student login -->
               <div class="input-group">
                 <div class="input-group-append">
                   <span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -100,8 +147,13 @@ $conn->close();
               <p>Use Password as your DOB with (-) like DD-MM-YYYY</p>
               <br>
               <center><button type="submit" class="btn btn-success btn-block">Login</button></center>
+              <!-- Display student login error message if any -->
+              <?php if (!empty($errorMsgStudent)) : ?>
+                <div class="alert alert-danger mt-4" role="alert">
+                  <?php echo $errorMsgStudent; ?>
+                </div>
+              <?php endif; ?>
             </form>
-            
           </div>
         </div>
       </div>
@@ -113,24 +165,29 @@ $conn->close();
             <h5 class="card-title text-center">Welcome to Center Login</h5>
             <br>
             <!-- Form content for center login -->
-            <form method="POST" action="#">
+            <form method="POST" action="index.php">
+              <input type="hidden" name="center_login" value="1"> <!-- Hidden field to differentiate center login -->
               <div class="input-group">
                 <div class="input-group-append">
                   <span class="input-group-text"><i class="fas fa-user"></i></span>
                 </div>
-                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                <input type="text" name="center_username" class="form-control" placeholder="Username" required>
               </div>
               <div class="input-group">
                 <div class="input-group-append">
                   <span class="input-group-text"><i class="fas fa-lock"></i></span>
                 </div>
-                <input type="text" name="password" class="form-control" placeholder="Password (DD-MM-YYYY)" required>
+                <input type="password" name="center_password" class="form-control" placeholder="Password" required>
               </div>
-              <p>Use Password as your DOB with (-) like DD-MM-YYYY</p>
               <br>
               <center><button type="submit" class="btn btn-success btn-block">Login</button></center>
+              <!-- Display center login error message if any -->
+              <?php if (!empty($errorMsgCenter)) : ?>
+                <div class="alert alert-danger mt-4" role="alert">
+                  <?php echo $errorMsgCenter; ?>
+                </div>
+              <?php endif; ?>
             </form>
-           
           </div>
         </div>
       </div>
