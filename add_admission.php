@@ -46,12 +46,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    
     // Handle image upload
     if ($_FILES['image']['size'] != 0 && $_FILES['image']['error'] == 0 && !empty($_FILES['image'])) {
-        // Process image upload
+        // Process image 
+        $base_url = 'https://tnscpe.graymatterworks.com/';
         $target_dir = "upload/images/";
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . strtolower($extension); // Unique filename
-        $target_path = $_SERVER['DOCUMENT_ROOT'] . '/https://tnscpe.graymatterworks.com/' . $target_dir; // Adjust to your project structure
+        $target_path = $base_url . $target_dir; // Adjust to your project structure
         $full_path = $target_path . $filename;
 
         if (move_uploaded_file($temp_name, $full_path)) {
