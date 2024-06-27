@@ -219,16 +219,14 @@ if ($status === 'success' && isset($_SESSION['admission_added']) && $_SESSION['a
     // Assuming $admission['image'] holds the image path relative to the domain or full URL
     $image_url = $admission['image'];
 
-    // Check if the image URL starts with "https://tnscpe.graymatterworks.com/"
-    if (strpos($image_url, 'https://tnscpe.graymatterworks.com/') === 0) {
-        // If it starts with the full domain URL, use it directly
-        echo '<img src="' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
-    } else {
-        // If it's a relative path, prepend the main domain URL
-        echo '<img src="https://tnscpewebsite.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
-    }
+    // First image with the original domain prefix
+    echo '<img src="https://tnscpe.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    
+    // Second image with the backup domain prefix (assumed to be different)
+    echo '<img src="https://tnscpewebsite.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
     ?>
 </td>
+
 
                   <td><?php echo $admission['candidate_name']; ?></td>
                   <td><?php echo $admission['fathers_name']; ?></td>
