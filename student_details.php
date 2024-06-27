@@ -157,7 +157,7 @@ $result = $conn->query($sql);
           <a class="nav-link" href="result.php"><i class="fas fa-poll"></i> Result</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-file-pdf">&nbsp;</i>Pdf</a>
+          <a class="nav-link" href="pdf.php"><i class="fas fa-file-pdf">&nbsp;</i>Pdf</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
