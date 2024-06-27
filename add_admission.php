@@ -52,11 +52,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . strtolower($extension); // Unique filename
-        $target_path = $_SERVER['DOCUMENT_ROOT'] .'/https://tnscpe.graymatterworks.com/'. $target_dir; // Adjust to your document root
+        $target_path = $_SERVER['DOCUMENT_ROOT'] . $target_dir; // Document root path
         $full_path = $target_path . $filename;
 
         if (move_uploaded_file($temp_name, $full_path)) {
-            $upload_image = $target_dir . $filename;
+            $upload_image = $DOMAIN_URL . $target_dir . $filename;
 
             // Insert data into the database
             $sql = "INSERT INTO admission (candidate_name, image, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
