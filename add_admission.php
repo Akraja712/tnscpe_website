@@ -51,15 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . strtolower($extension); // Unique filename
-        $target_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $target_dir; // Adjust to your project structure
+        $target_path = $_SERVER['DOCUMENT_ROOT'] . '/https://tnscpe.graymatterworks.com/' . $target_dir; // Adjust to your project structure
         $full_path = $target_path . $filename;
-        
-        // Moving the uploaded file to the target directory
-        if (move_uploaded_file($temp_name, $full_path)) {
-            echo "The file has been uploaded successfully!";
-        } else {
-            echo "Sorry, there was an error uploading your file.";
-        }
 
         if (move_uploaded_file($temp_name, $full_path)) {
             $upload_image = $target_dir . $filename;
