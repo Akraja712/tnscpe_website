@@ -219,11 +219,14 @@ if ($status === 'success' && isset($_SESSION['admission_added']) && $_SESSION['a
     // Assuming $admission['image'] holds the image path relative to the domain or full URL
     $image_url = $admission['image'];
 
-    // First image with the original domain prefix
-    echo '<img src="https://tnscpe.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
-    
-    // Second image with the backup domain prefix (assumed to be different)
-    echo '<img src="https://tnscpewebsite.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    // Check if the image URL starts with "https://tnscpe.graymatterworks.com/"
+    if (!empty($image_url) && strpos($image_url, 'https://tnscpe.graymatterworks.com/') === 0) {
+        // Display the image from the first domain
+        echo '<img src="' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    } else {
+        // Display the image from the backup domain
+        echo '<img src="https://tnscpewebsite.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    }
     ?>
 </td>
 
