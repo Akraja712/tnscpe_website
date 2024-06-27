@@ -2,11 +2,11 @@
 session_start();
 require 'db.php'; // Ensure db.php includes your database connection
 
-// Fetch categories from database
+// Fetch categories from the database
 $sql_categories = "SELECT id, name FROM category";
 $result_categories = $conn->query($sql_categories);
 
-// Generate options for category dropdown
+// Generate options for the category dropdown
 $category_options = '';
 if ($result_categories && $result_categories->num_rows > 0) {
     while ($row = $result_categories->fetch_assoc()) {
@@ -16,11 +16,11 @@ if ($result_categories && $result_categories->num_rows > 0) {
     }
 }
 
-// Fetch centers from database
+// Fetch centers from the database
 $sql_centers = "SELECT id, center_name FROM center"; // Adjust table name as per your database structure
 $result_centers = $conn->query($sql_centers);
 
-// Generate options for center dropdown
+// Generate options for the center dropdown
 $center_options = '';
 if ($result_centers && $result_centers->num_rows > 0) {
     while ($row = $result_centers->fetch_assoc()) {
@@ -43,26 +43,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employeed = ($_POST['employeed'] == 'Yes') ? 1 : 0;
     $center_id = mysqli_real_escape_string($conn, $_POST['center_id']);
 
-   
     // Handle image upload
     if ($_FILES['image']['size'] != 0 && $_FILES['image']['error'] == 0 && !empty($_FILES['image'])) {
-        // Process image 
-        $base_url = 'https://tnscpe.graymatterworks.com/';
-        $target_dir = "upload/images/";
+        // Process image upload
+        $target_dir = "upload/images/"; // Adjust to your project structure relative to the document root
         $temp_name = $_FILES["image"]["tmp_name"];
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . strtolower($extension); // Unique filename
-        
-        // Adjust the target path to your project structure
-        $project_path = 'public_html/tnscpe/';
-        $target_path = $base_url . $project_path . $target_dir;
+        $target_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $target_dir; // Adjust to your document root
         $full_path = $target_path . $filename;
-        
 
         if (move_uploaded_file($temp_name, $full_path)) {
             $upload_image = $target_dir . $filename;
 
-            // Insert data into database
+            // Insert data into the database
             $sql = "INSERT INTO admission (candidate_name, image, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
                     VALUES ('$candidate_name', '$upload_image','$fathers_name','$mothers_name','$dob','$gender','$category_id','$id_proof_type','$id_proof_no','$employeed','$center_id')";
             if ($conn->query($sql) === TRUE) {
@@ -77,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<p class="alert alert-danger">Failed to upload image.</p>';
         }
     } else {
-        // If image is not uploaded or empty
+        // If the image is not uploaded or empty
         $sql = "INSERT INTO admission (candidate_name, fathers_name, mothers_name, dob, gender, category_id, id_proof_type, id_proof_no, employeed, center_id) 
                 VALUES ('$candidate_name','$fathers_name','$mothers_name','$dob','$gender','$category_id','$id_proof_type','$id_proof_no','$employeed','$center_id')";
         if ($conn->query($sql) === TRUE) {
