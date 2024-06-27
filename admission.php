@@ -214,7 +214,22 @@ if ($status === 'success' && isset($_SESSION['admission_added']) && $_SESSION['a
               <?php foreach ($admissions as $admission): ?>
                 <tr>
                   <td><?php echo $admission['id']; ?></td>
-                  <td><img src="https://tnscpe.graymatterworks.com/<?php echo $admission['image']; ?>" class="img-thumbnail" style="max-width: 100px;"></td>
+                  <td>
+    <?php
+    // Assuming $admission['image'] holds the image path relative to the domain or full URL
+    $image_url = $admission['image'];
+
+    // Check if the image URL starts with "https://tnscpe.graymatterworks.com/"
+    if (strpos($image_url, 'https://tnscpe.graymatterworks.com/') === 0) {
+        // If it starts with the full domain URL, use it directly
+        echo '<img src="' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    } else {
+        // If it's a relative path, prepend the main domain URL
+        echo '<img src="https://tnscpewebsite.graymatterworks.com/' . $image_url . '" class="img-thumbnail" style="max-width: 100px;">';
+    }
+    ?>
+</td>
+
                   <td><?php echo $admission['candidate_name']; ?></td>
                   <td><?php echo $admission['fathers_name']; ?></td>
                   <td><?php echo $admission['mothers_name']; ?></td>
